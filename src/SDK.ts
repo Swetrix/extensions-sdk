@@ -36,6 +36,10 @@ export type EventsObject = {
   [key in event]?: (eventData: any) => any
 }
 
+type SwetrixCallbacks = {
+  onAddExportDataRow: (name: string, onClick: () => void) => void
+}
+
 /**
  * Initialise the SDK instance.
  *
@@ -45,6 +49,7 @@ export type EventsObject = {
  */
 export class SDK {
   private events: EventsObject = {}
+  private exportDataRowValues: Array<string> = []
 
   /**
    * Initialise the SDK instance.
@@ -52,7 +57,7 @@ export class SDK {
    * @param {SDKExtension[]} extensions The extensions to load and execute.
    * @param {SDKOptions} options Swetrix SDK options.
    */
-  constructor(private extensions: SDKExtension[], private options?: SDKOptions) {
+  constructor(private extensions: SDKExtension[], private options?: SDKOptions, private swetrixCallbacks?: SwetrixCallbacks) {
     this.init()
   }
 
@@ -167,5 +172,17 @@ export class SDK {
       ...this.events,
       [event]: undefined,
     }
+  }
+
+  public addExportDataRow(name: string, onClick: () => void): void {
+    this.debug(`Adding export data row ${name}`)
+
+    if (this.exportDataRowValues.includes(name)) {
+      this.debug(`Export data row ${name} already exists`, DebugType.WARN)
+      return
+    }
+
+    this.exportDataRowValues.push(name)
+    this.swetrixCallbacks?.onAddExportDataRow(name, onClick)
   }
 }
