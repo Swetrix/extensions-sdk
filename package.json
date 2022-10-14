@@ -1,0 +1,50 @@
+{
+  "name": "swetrix-sdk",
+  "version": "1.0.0",
+  "description": "Swetrix SDK for developing custom extensions for the platform ",
+  "main": "dist/swetrix-sdk.cjs.js",
+  "module": "dist/swetrix-sdk.es5.js",
+  "browser": "dist/swetrix-sdk.js",
+  "esnext": "dist/esnext/index.js",
+  "typings": "dist/esnext/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "prepublish": "npm run build",
+    "build": "rollup -c --bundleConfigAsCjs && tsc -p tsconfig.esnext.json",
+    "start": "rollup -c -w --bundleConfigAsCjs",
+    "tsc": "tsc -p tsconfig.esnext.json"
+  },
+  "keywords": [
+    "swetrix",
+    "analytics",
+    "monitoring",
+    "metrics",
+    "privacy"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Swetrix/extensions-sdk.git"
+  },
+  "author": "Andrii R. <contact@swetrix.com>",
+  "funding": "https://ko-fi.com/andriir",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Swetrix/extensions-sdk/issues"
+  },
+  "homepage": "https://marketplace.swetrix.com/docs",
+  "dependencies": {
+    "@types/node": "^18.8.5"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^23.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^3.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "rollup-plugin-uglify": "^6.0.4",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.4"
+  }
+}
