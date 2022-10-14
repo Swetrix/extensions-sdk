@@ -1,3 +1,5 @@
+import { getPanelTabName } from './utils'
+
 export interface SDKOptions {
   /**
    * When set to `true`, all logs will be printed to console.
@@ -22,7 +24,20 @@ export enum event {
    * The event is triggered when the SDK is initialized.
    */
   INIT = 'init',
+}
 
+export enum PanelTab {
+  cc = 'cc',
+  pg = 'pg',
+  lc = 'lc',
+  ref = 'ref',
+  dv = 'dv',
+  br = 'br',
+  os = 'os',
+  so = 'so',
+  me = 'me',
+  ca = 'ca',
+  lt = 'lt',
 }
 
 enum DebugType {
@@ -38,6 +53,9 @@ export type EventsObject = {
 
 type SwetrixCallbacks = {
   onAddExportDataRow: (name: string, onClick: () => void) => void
+  onRemoveExportDataRow: (name: string) => void
+  onAddPanelTab: (extensionID: string, panelID: string, onClick: () => void) => void
+  onRemovePanelTab: (extensionID: string, panelID: string) => void
 }
 
 /**
@@ -50,6 +68,7 @@ type SwetrixCallbacks = {
 export class SDK {
   private events: EventsObject = {}
   private exportDataRowValues: Array<string> = []
+  private panelTabValues: Array<string> = []
 
   /**
    * Initialise the SDK instance.
@@ -158,5 +177,41 @@ export class SDK {
 
     this.exportDataRowValues.push(name)
     this.swetrixCallbacks?.onAddExportDataRow(name, onClick)
+  }
+
+  public removeExportDataRow(name: string): void {
+    this.debug(`Removing export data row ${name}`)
+
+    if (!this.exportDataRowValues.includes(name)) {
+      this.debug(`Export data row ${name} does not exist`, DebugType.WARN)
+      return
+    }
+
+    this.exportDataRowValues = this.exportDataRowValues.filter(value => value !== name)
+    this.swetrixCallbacks?.onRemoveExportDataRow(name)
+  }
+
+  public addPanelTab(extensionID: string, panelID: PanelTab, onClick: () => void): void {
+    this.debug(`Adding panel tab ${panelID}`)
+    const panelName = getPanelTabName(extensionID, panelID)
+
+    if (this.panelTabValues.includes(panelName)) {
+      this.debug(`Panel tab ${panelID} (${extensionID}) already exists`, DebugType.WARN)
+      return
+    }
+
+    this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, onClick)
+  }
+
+  public removePanelTab(extensionID: string, panelID: PanelTab): void {
+    this.debug(`Removing panel tab ${panelID}`)
+    const panelName = getPanelTabName(extensionID, panelID)
+
+    if (!this.panelTabValues.includes(panelName)) {
+      this.debug(`Panel tab ${panelID} (${extensionID}) does not exist`, DebugType.WARN)
+      return
+    }
+
+    this.swetrixCallbacks?.onRemovePanelTab(extensionID, panelID)
   }
 }
