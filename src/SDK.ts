@@ -95,7 +95,8 @@ export class SDK {
     //   this.loadExtension(cdnURL)
     // })
 
-    this.loadExtension('file:///Users/andrii/dev/swetrix/test_extension.js')
+    // this.loadExtension('file:///Users/andrii/dev/swetrix/test_extension.js')
+    this.loadExtension('http://localhost:3000/assets/test_extension.js')
   }
 
   private onExtesionLoadError = (cdnURL: string) => {
