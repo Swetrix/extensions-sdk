@@ -67,36 +67,9 @@ export class SDK {
       return
     }
 
-    // way 1
-
-    // this.extensions.forEach((extension) => {
-    //   fetch(extension.cdnURL)
-    //     // Parse the response as blob
-    //     .then((res) => {
-    //       if (!res.ok) {
-    //         return new Blob
-    //       }
-
-    //       return res.blob()
-    //     })
-    //     // Create a script tag, append it to the head
-    //     .then((extBlob) => {
-    //       var objectURL = URL.createObjectURL(extBlob)
-    //       var sc = document.createElement('script')
-    //       sc.setAttribute('src', objectURL)
-    //       sc.setAttribute('type', 'text/javascript')
-    //       document.head.appendChild(sc)
-    //     })
-    // })
-
-    // way 2
-
-    // this.extensions.forEach(({ cdnURL }) => {
-    //   this.loadExtension(cdnURL)
-    // })
-
-    // this.loadExtension('file:///Users/andrii/dev/swetrix/test_extension.js')
-    this.loadExtension('http://localhost:3000/assets/test_extension.js')
+    this.extensions.forEach(({ cdnURL }) => {
+      this.loadExtension(cdnURL)
+    })
   }
 
   private onExtesionLoadError = (cdnURL: string) => {
