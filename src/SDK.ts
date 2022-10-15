@@ -167,6 +167,13 @@ export class SDK {
     }
   }
 
+  /**
+   * Add a new export data row into the dropdown.
+   * 
+   * @param name The name of the export data row.
+   * @param onClick The callback to execute when the export data row is clicked.
+   * @returns {void}
+   */
   public addExportDataRow(name: string, onClick: () => void): void {
     this.debug(`Adding export data row ${name}`)
 
@@ -179,6 +186,12 @@ export class SDK {
     this.swetrixCallbacks?.onAddExportDataRow(name, onClick)
   }
 
+  /**
+   * Remove an export data row from the dropdown.
+   * 
+   * @param name The name of the export data row.
+   * @returns {void}
+   */
   public removeExportDataRow(name: string): void {
     this.debug(`Removing export data row ${name}`)
 
@@ -191,6 +204,14 @@ export class SDK {
     this.swetrixCallbacks?.onRemoveExportDataRow(name)
   }
 
+  /**
+   * Add a new panel tab into the dashboard panels.
+   * 
+   * @param extensionID The ID of the extension.
+   * @param panelID The ID of the panel.
+   * @param onClick The callback to execute when the panel tab is opened.
+   * @returns {void}
+   */
   public addPanelTab(extensionID: string, panelID: PanelTab, onClick: () => void): void {
     this.debug(`Adding panel tab ${panelID}`)
     const panelName = getPanelTabName(extensionID, panelID)
@@ -203,6 +224,13 @@ export class SDK {
     this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, onClick)
   }
 
+  /**
+   * Remove a panel tab from the dashboard panels.
+   * 
+   * @param extensionID The ID of the extension.
+   * @param panelID The ID of the panel.
+   * @returns {void}
+   */
   public removePanelTab(extensionID: string, panelID: PanelTab): void {
     this.debug(`Removing panel tab ${panelID}`)
     const panelName = getPanelTabName(extensionID, panelID)
