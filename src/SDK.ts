@@ -64,7 +64,7 @@ type EventsObject = {
 type SwetrixCallbacks = {
   onAddExportDataRow: (name: string, onClick: () => void) => void
   onRemoveExportDataRow: (name: string) => void
-  onAddPanelTab: (extensionID: string, panelID: string, onClick: () => void) => void
+  onAddPanelTab: (extensionID: string, panelID: string, tabContent: string, onClick: () => void) => void
   onRemovePanelTab: (extensionID: string, panelID: string) => void
 }
 
@@ -241,7 +241,7 @@ export class SDK {
     this.swetrixCallbacks?.onRemoveExportDataRow(name)
   }
 
-  public addPanelTab(extensionID: string): (panelID: PanelTab, onOpen: () => void) => void {
+  public addPanelTab(extensionID: string): (panelID: PanelTab, tabContent: string, onOpen: () => void) => void {
     /**
      * Add a new panel tab into the dashboard panels.
      * 
@@ -250,7 +250,7 @@ export class SDK {
      * @param onOpen The callback to execute when the panel tab is opened.
      * @returns {void}
      */
-    return (panelID: PanelTab, onOpen: () => void): void => {
+    return (panelID: PanelTab, tabContent: string, onOpen: () => void = () => {}): void => {
       this.debug(`Adding panel tab ${panelID}`)
       const panelName = getPanelTabName(extensionID, panelID)
 
@@ -259,7 +259,7 @@ export class SDK {
         return
       }
 
-      this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, onOpen)
+      this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, tabContent, onOpen)
     }
   }
 
