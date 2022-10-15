@@ -241,16 +241,16 @@ export class SDK {
     this.swetrixCallbacks?.onRemoveExportDataRow(name)
   }
 
-  public addPanelTab(extensionID: string): (panelID: PanelTab, onClick: () => void) => void {
+  public addPanelTab(extensionID: string): (panelID: PanelTab, onOpen: () => void) => void {
     /**
      * Add a new panel tab into the dashboard panels.
      * 
      * @param extensionID The ID of the extension.
      * @param panelID The ID of the panel.
-     * @param onClick The callback to execute when the panel tab is opened.
+     * @param onOpen The callback to execute when the panel tab is opened.
      * @returns {void}
      */
-    return (panelID: PanelTab, onClick: () => void): void => {
+    return (panelID: PanelTab, onOpen: () => void): void => {
       this.debug(`Adding panel tab ${panelID}`)
       const panelName = getPanelTabName(extensionID, panelID)
 
@@ -259,7 +259,7 @@ export class SDK {
         return
       }
 
-      this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, onClick)
+      this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, onOpen)
     }
   }
 
