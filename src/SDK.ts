@@ -260,6 +260,7 @@ export class SDK {
       }
 
       this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, tabContent, onOpen)
+      this.panelTabValues.push(panelName)
     }
   }
 
