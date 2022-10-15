@@ -259,8 +259,8 @@ export class SDK {
         return
       }
 
-      this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, tabContent, onOpen)
       this.panelTabValues.push(panelName)
+      this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, tabContent, onOpen)
     }
   }
 
