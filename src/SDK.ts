@@ -30,6 +30,16 @@ export enum event {
    * For example, when user opens dashboard for the first time, changes the data range or time bucket.
    */
   LOAD = 'load',
+
+  /**
+   * The event is triggered when user changes the filters.
+   */
+  FILTERS_UPDATE = 'filtersupdate',
+
+  /**
+   * The event is triggered when user changes the time bucket, time perios or sets the date range.
+   */
+  TIME_UPDATE = 'timeupdate',
 }
 
 export enum PanelTab {
