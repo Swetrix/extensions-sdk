@@ -143,12 +143,18 @@ export class SDK {
     }
   }
 
-  public async _emitEvent(event: event, eventData: any): Promise<void> {
+  public _emitEvent(event: event, eventData: any): void {
     this.debug(`Emitting event '${event}'`)
 
     if (this.events[event]) {
       // @ts-ignore - TS does not like the fact that we are iterating over an object
-      Object.values(this.events[event]).forEach(callback => callback(eventData))
+      Object.values(this.events[event]).forEach(callback => {
+        // Adding a delay before calling events to make sure that the dashboard has time to render
+        // in case some callbacks taking a long time to execute
+        setTimeout(() => {
+          callback(eventData)
+        }, 300)
+      })
     }
   }
 
