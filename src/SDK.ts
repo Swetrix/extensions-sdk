@@ -81,9 +81,10 @@ type SwetrixCallbacks = {
 /**
  * Initialise the SDK instance.
  *
- * @param {string} pid The Project ID to link the instance of Swetrix.js to.
- * @param {SDKOptions} options Options related to the tracking.
- * @returns {SDK} Instance of the Swetrix.js.
+ * @param {SDKExtension[]} extensions A list of extension to load and execute.
+ * @param {SDKOptions} options SDK options.
+ * @param {SwetrixCallbacks} swetrixCallbacks Callbacks to interact with Swetrix website.
+ * @returns {SDK} Instance of the Swetrix SDK.
  */
 export class SDK {
   private events: EventsObject = {}
@@ -93,8 +94,9 @@ export class SDK {
   /**
    * Initialise the SDK instance.
    * 
-   * @param {SDKExtension[]} extensions The extensions to load and execute.
+   * @param {SDKExtension[]} extensions A list of extension to load and execute.
    * @param {SDKOptions} options Swetrix SDK options.
+   * @param {SwetrixCallbacks} swetrixCallbacks Callbacks to interact with Swetrix website.
    */
   constructor(private extensions: SDKExtension[], private options?: SDKOptions, private swetrixCallbacks?: SwetrixCallbacks) {
     this._init()
