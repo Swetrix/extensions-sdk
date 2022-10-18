@@ -173,12 +173,13 @@ export class SDK {
   }
 
   public _emitEvent(event: event, eventData: any): void {
-    this.debug(`Emitting event '${event}'`)
-
     if (!this._sdkInitialised) {
+      this.debug(`Trying to emit event '${event}', but it as added to queue as the SDK is not initialised yet`, DebugType.WARN)
       this._emitQueue.push({ event, eventData })
       return
     }
+
+    this.debug(`Emitting event '${event}'`)
 
     if (this.events[event]) {
       // @ts-ignore - TS does not like the fact that we are iterating over an object
