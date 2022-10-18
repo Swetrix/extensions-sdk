@@ -40,6 +40,11 @@ export enum event {
    * The event is triggered when user changes the time bucket, time perios or sets the date range.
    */
   TIME_UPDATE = 'timeupdate',
+
+  /**
+   * The event is triggered on load and it supplies information about the project it's running on.
+   */
+  PROJECT_INFO = 'projectinfo',
 }
 
 export enum PanelTab {
