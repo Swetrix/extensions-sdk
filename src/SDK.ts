@@ -95,6 +95,8 @@ export class SDK {
   private events: EventsObject = {}
   private exportDataRowValues: Array<string> = []
   private panelTabValues: Array<string> = []
+  private _sdkInitialised: boolean = false
+  private _emitQueue: Array<{ event: event, eventData: any }> = []
 
   /**
    * Initialise the SDK instance.
@@ -113,13 +115,21 @@ export class SDK {
       return
     }
 
-    this.extensions.forEach(({ cdnURL, id }) => {
-      this._loadExtension(cdnURL, id)
-    })
+    const promisified = this.extensions.map(({ cdnURL, id }) => this._loadExtension(cdnURL, id))
+
+    Promise.all(promisified)
+      .then(() => {
+        this.debug('SDK initialised')
+        this._sdkInitialised = true
+        this._emitQueue.forEach(({ event, eventData }) => {
+          this._emitEvent(event, eventData)
+        })
+        this._emitQueue = []
+      })
   }
 
-  private _loadExtension = (cdnURL: string, id: string): void => {
-    fetch(cdnURL)
+  private _loadExtension = (cdnURL: string, id: string): Promise<any> => {
+    return fetch(cdnURL)
       // Parse the response as text, return a dummy script if the response is not ok
       .then((res) => {
         if (!res.ok) {
@@ -150,7 +160,9 @@ export class SDK {
           _destroy: undefined,
           _loadExtension: undefined,
           _init: undefined,
+          _emitQueue: undefined,
         })
+        this.debug(`Extension ${id} loaded and executed`)
       })
   }
 
@@ -162,6 +174,11 @@ export class SDK {
 
   public _emitEvent(event: event, eventData: any): void {
     this.debug(`Emitting event '${event}'`)
+
+    if (!this._sdkInitialised) {
+      this._emitQueue.push({ event, eventData })
+      return
+    }
 
     if (this.events[event]) {
       // @ts-ignore - TS does not like the fact that we are iterating over an object
