@@ -79,7 +79,8 @@ type EventsObject = {
 type SwetrixCallbacks = {
   onAddExportDataRow: (name: string, onClick: () => void) => void
   onRemoveExportDataRow: (name: string) => void
-  onAddPanelTab: (extensionID: string, panelID: string, tabContent: string, onClick: () => void) => void
+  onAddPanelTab: (extensionID: string, panelID: string, tabContent?: string, onClick?: () => void) => void
+  onUpdatePanelTab: (extensionID: string, panelID: string, tabContent?: string) => void
   onRemovePanelTab: (extensionID: string, panelID: string) => void
 }
 
@@ -156,6 +157,7 @@ export class SDK {
 
           // Presetting functions which require extension id
           addPanelTab: this.addPanelTab(id),
+          updatePanelTab: this.updatePanelTab(id),
           removePanelTab: this.removePanelTab(id),
           addEventListener: this.addEventListener(id),
           removeEventListener: this.removeEventListener(id),
@@ -287,7 +289,7 @@ export class SDK {
     this.swetrixCallbacks?.onRemoveExportDataRow(name)
   }
 
-  public addPanelTab(extensionID: string): (panelID: PanelTab, tabContent: string, onOpen: () => void) => void {
+  public addPanelTab(extensionID: string): (panelID: PanelTab, tabContent?: string, onOpen?: () => void) => void {
     /**
      * Add a new panel tab into the dashboard panels.
      * 
@@ -296,7 +298,7 @@ export class SDK {
      * @param onOpen The callback to execute when the panel tab is opened.
      * @returns {void}
      */
-    return (panelID: PanelTab, tabContent: string, onOpen: () => void = () => {}): void => {
+    return (panelID: PanelTab, tabContent?: string, onOpen: () => void = () => {}): void => {
       this.debug(`Adding panel tab ${panelID}`)
       const panelName = getPanelTabName(extensionID, panelID)
 
@@ -307,6 +309,28 @@ export class SDK {
 
       this.panelTabValues.push(panelName)
       this.swetrixCallbacks?.onAddPanelTab(extensionID, panelID, tabContent, onOpen)
+    }
+  }
+
+  public updatePanelTab(extensionID: string): (panelID: PanelTab, tabContent?: string) => void {
+    /**
+     * Update a panel tab in the dashboard panels.
+     * 
+     * @param extensionID The ID of the extension.
+     * @param panelID The ID of the panel.
+     * @param tabContent The new content of the panel tab.
+     * @returns {void}
+     */
+    return (panelID: PanelTab, tabContent?: string): void => {
+      this.debug(`Updating panel tab ${panelID}`)
+      const panelName = getPanelTabName(extensionID, panelID)
+
+      if (!this.panelTabValues.includes(panelName)) {
+        this.debug(`Panel tab ${panelID} (${extensionID}) does not exist`, DebugType.WARN)
+        return
+      }
+
+      this.swetrixCallbacks?.onUpdatePanelTab(extensionID, panelID, tabContent)
     }
   }
 
