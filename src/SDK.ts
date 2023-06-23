@@ -110,6 +110,11 @@ export class SDK {
   }
 
   private _init(): void {
+    if (this._sdkInitialised) {
+      this.debug('SDK is already initialised, skipping initialisation')
+      return
+    }
+
     if (this.options?.disabled) {
       this.debug('SDK is disabled, skipping initialisation')
       return
