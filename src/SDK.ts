@@ -45,6 +45,11 @@ export enum event {
    * The event is triggered on load and it supplies information about the project it's running on.
    */
   PROJECT_INFO = 'projectinfo',
+
+  /**
+   * Contains the client metainfo (theme, language, etc.).
+   */
+  CLIENT_INFO = 'clientinfo',
 }
 
 export enum PanelTab {
