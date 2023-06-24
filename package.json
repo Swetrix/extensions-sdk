@@ -1,6 +1,6 @@
 {
   "name": "@swetrix/sdk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Swetrix SDK for developing custom extensions for the platform ",
   "main": "dist/swetrix-sdk.cjs.js",
   "module": "dist/swetrix-sdk.es5.js",
