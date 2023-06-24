@@ -64,6 +64,7 @@ export enum PanelTab {
   me = 'me',
   ca = 'ca',
   lt = 'lt',
+  ce = 'ce',
 }
 
 enum DebugType {
