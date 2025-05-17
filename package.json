@@ -1,7 +1,8 @@
 {
   "name": "@swetrix/sdk",
-  "version": "1.1.0",
-  "description": "Swetrix SDK for developing custom extensions for the platform ",
+  "version": "1.2.0",
+  "type": "module",
+  "description": "SDK for developing custom extensions for Swetrix",
   "main": "dist/swetrix-sdk.cjs.js",
   "module": "dist/swetrix-sdk.es5.js",
   "browser": "dist/swetrix-sdk.js",
@@ -10,9 +11,17 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "rollup -c --bundleConfigAsCjs && tsc -p tsconfig.esnext.json",
-    "start": "rollup -c -w --bundleConfigAsCjs",
+    "build": "rollup -c && npm run tsc",
+    "start": "rollup -c -w",
     "tsc": "tsc -p tsconfig.esnext.json"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esnext/index.js",
+      "require": "./dist/swetrix-sdk.cjs.js",
+      "types": "./dist/esnext/index.d.ts",
+      "default": "./dist/swetrix-sdk.js"
+    }
   },
   "keywords": [
     "swetrix",
@@ -25,26 +34,30 @@
     "type": "git",
     "url": "git+https://github.com/Swetrix/extensions-sdk.git"
   },
-  "author": "Andrii R. <contact@swetrix.com>",
-  "funding": "https://ko-fi.com/andriir",
+  "author": "Andrii Romasiun <contact@swetrix.com>",
   "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/Swetrix/extensions-sdk/issues"
   },
   "homepage": "https://marketplace.swetrix.com/docs",
-  "dependencies": {
-    "@types/node": "^18.8.5"
-  },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^23.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.0",
-    "rimraf": "^3.0.2",
-    "rollup": "^3.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-sourcemaps": "^0.6.3",
-    "rollup-plugin-typescript2": "^0.34.1",
-    "rollup-plugin-uglify": "^6.0.4",
-    "tslib": "^2.4.0",
-    "typescript": "^4.8.4"
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@types/node": "^22.15.18",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.40.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "onFail": "error",
+      "version": ">=22"
+    }
+  },
+  "dependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2"
   }
 }

@@ -24,50 +24,50 @@ export interface SDKExtension {
   id: string
 }
 
-export enum event {
+export type ExtensionEvent =
   /**
    * The event is triggered when the dashboard loads a new set of analytics data.
    * For example, when user opens dashboard for the first time, changes the data range or time bucket.
    */
-  LOAD = 'load',
-
+  | 'load'
   /**
    * The event is triggered when user changes the filters.
    */
-  FILTERS_UPDATE = 'filtersupdate',
+  | 'filtersupdate'
 
   /**
    * The event is triggered when user changes the time bucket, time perios or sets the date range.
    */
-  TIME_UPDATE = 'timeupdate',
-
+  | 'timeupdate'
   /**
    * The event is triggered on load and it supplies information about the project it's running on.
    */
-  PROJECT_INFO = 'projectinfo',
-
+  | 'projectinfo'
   /**
    * Contains the client metainfo (theme, language, etc.).
    */
-  CLIENT_INFO = 'clientinfo',
-}
+  | 'clientinfo'
 
-export enum PanelTab {
-  cc = 'cc',
-  pg = 'pg',
-  lc = 'lc',
-  ref = 'ref',
-  dv = 'dv',
-  br = 'br',
-  os = 'os',
-  so = 'so',
-  me = 'me',
-  ca = 'ca',
-  lt = 'lt',
-  ce = 'ce',
-}
+export type PanelTab =
+  | 'cc'
+  | 'rg'
+  | 'ct'
+  | 'host'
+  | 'pg'
+  | 'lc'
+  | 'br'
+  | 'brv'
+  | 'os'
+  | 'osv'
+  | 'dv'
+  | 'ref'
+  | 'so'
+  | 'me'
+  | 'ca'
+  | 'te'
+  | 'co'
 
-enum DebugType {
+export enum DebugType {
   LOG = 'log',
   ERROR = 'error',
   WARN = 'warn',
@@ -79,7 +79,7 @@ type EventsSubObject = {
 }
 
 type EventsObject = {
-  [key in event]?: EventsSubObject
+  [key in ExtensionEvent]?: EventsSubObject
 }
 
 type SwetrixCallbacks = {
@@ -103,16 +103,20 @@ export class SDK {
   private exportDataRowValues: Array<string> = []
   private panelTabValues: Array<string> = []
   private _sdkInitialised: boolean = false
-  private _emitQueue: Array<{ event: event, eventData: any }> = []
+  private _emitQueue: Array<{ event: ExtensionEvent; eventData: any }> = []
 
   /**
    * Initialise the SDK instance.
-   * 
+   *
    * @param {SDKExtension[]} extensions A list of extension to load and execute.
    * @param {SDKOptions} options Swetrix SDK options.
    * @param {SwetrixCallbacks} swetrixCallbacks Callbacks to interact with Swetrix website.
    */
-  constructor(private extensions: SDKExtension[], private options?: SDKOptions, private swetrixCallbacks?: SwetrixCallbacks) {
+  constructor(
+    private extensions: SDKExtension[],
+    private options?: SDKOptions,
+    private swetrixCallbacks?: SwetrixCallbacks,
+  ) {
     this._init()
   }
 
@@ -129,54 +133,55 @@ export class SDK {
 
     const promisified = this.extensions.map(({ cdnURL, id }) => this._loadExtension(cdnURL, id))
 
-    Promise.all(promisified)
-      .then(() => {
-        this.debug('SDK initialised')
-        this._sdkInitialised = true
-        this._emitQueue.forEach(({ event, eventData }) => {
-          this._emitEvent(event, eventData)
-        })
-        this._emitQueue = []
+    Promise.all(promisified).then(() => {
+      this.debug('SDK initialised')
+      this._sdkInitialised = true
+      this._emitQueue.forEach(({ event, eventData }) => {
+        this._emitEvent(event, eventData)
       })
+      this._emitQueue = []
+    })
   }
 
   private _loadExtension = (cdnURL: string, id: string): Promise<any> => {
-    return fetch(cdnURL)
-      // Parse the response as text, return a dummy script if the response is not ok
-      .then((res) => {
-        if (!res.ok) {
-          this.debug(`Error while loading extension from ${cdnURL}`, DebugType.ERROR)
-          return '(() => {})'
-        }
+    return (
+      fetch(cdnURL)
+        // Parse the response as text, return a dummy script if the response is not ok
+        .then((res) => {
+          if (!res.ok) {
+            this.debug(`Error while loading extension from ${cdnURL}`, DebugType.ERROR)
+            return '(() => {})'
+          }
 
-        return res.text()
-      })
-      // Execute the extension
-      .then(code => {
-        eval(code)({
-          ...this,
-
-          // Keeping this here as for some reason ...this does not include the methods
-          addExportDataRow: this.addExportDataRow,
-          debug: this.debug,
-          removeExportDataRow: this.removeExportDataRow,
-
-          // Presetting functions which require extension id
-          addPanelTab: this.addPanelTab(id),
-          updatePanelTab: this.updatePanelTab(id),
-          removePanelTab: this.removePanelTab(id),
-          addEventListener: this.addEventListener(id),
-          removeEventListener: this.removeEventListener(id),
-
-          // Functions that should not be exposed to the extensions
-          _emitEvent: undefined,
-          _destroy: undefined,
-          _loadExtension: undefined,
-          _init: undefined,
-          _emitQueue: undefined,
+          return res.text()
         })
-        this.debug(`Extension ${id} loaded and executed`)
-      })
+        // Execute the extension
+        .then((code) => {
+          eval(code)({
+            ...this,
+
+            // Keeping this here as for some reason ...this does not include the methods
+            addExportDataRow: this.addExportDataRow,
+            debug: this.debug,
+            removeExportDataRow: this.removeExportDataRow,
+
+            // Presetting functions which require extension id
+            addPanelTab: this.addPanelTab(id),
+            updatePanelTab: this.updatePanelTab(id),
+            removePanelTab: this.removePanelTab(id),
+            addEventListener: this.addEventListener(id),
+            removeEventListener: this.removeEventListener(id),
+
+            // Functions that should not be exposed to the extensions
+            _emitEvent: undefined,
+            _destroy: undefined,
+            _loadExtension: undefined,
+            _init: undefined,
+            _emitQueue: undefined,
+          })
+          this.debug(`Extension ${id} loaded and executed`)
+        })
+    )
   }
 
   private debug(message: string, type: DebugType = DebugType.LOG): void {
@@ -185,9 +190,12 @@ export class SDK {
     }
   }
 
-  public _emitEvent(event: event, eventData: any): void {
+  public _emitEvent(event: ExtensionEvent, eventData: any): void {
     if (!this._sdkInitialised) {
-      this.debug(`Trying to emit event '${event}', but it as added to queue as the SDK is not initialised yet`, DebugType.WARN)
+      this.debug(
+        `Trying to emit event '${event}', but it as added to queue as the SDK is not initialised yet`,
+        DebugType.WARN,
+      )
       this._emitQueue.push({ event, eventData })
       return
     }
@@ -196,7 +204,7 @@ export class SDK {
 
     if (this.events[event]) {
       // @ts-ignore - TS does not like the fact that we are iterating over an object
-      Object.values(this.events[event]).forEach(callback => {
+      Object.values(this.events[event]).forEach((callback) => {
         // Adding a delay before calling events to make sure that the dashboard has time to render
         // in case some callbacks taking a long time to execute
         setTimeout(() => {
@@ -216,15 +224,11 @@ export class SDK {
   // Public methods that are avaliable to the extension developers.
   // -----------
 
-  public addEventListener(extensionID: string): (event: event, callback: (eventData: any) => any) => void {
+  public addEventListener(extensionID: string): (event: ExtensionEvent, callback: (eventData: any) => any) => void {
     /**
      * Add an event listener.
-     * 
-     * @param {event} event The event to listen to.
-     * @param {(eventData: any) => any} callback The callback to execute when the event is triggered.
-     * @returns {void}
      */
-    return (event: event, callback: (eventData: any) => any) => {
+    return (event: ExtensionEvent, callback: (eventData: any) => any) => {
       this.debug(`Adding event listener for ${event} (extension: ${extensionID})`)
 
       if (typeof callback !== 'function') {
@@ -242,14 +246,11 @@ export class SDK {
     }
   }
 
-  public removeEventListener(extensionID: string): (event: event) => void {
+  public removeEventListener(extensionID: string): (event: ExtensionEvent) => void {
     /**
      * Remove an event listener.
-     * 
-     * @param {event} event The event to remove the listener from.
-     * @returns {void}
      */
-    return (event: event) => {
+    return (event: ExtensionEvent) => {
       this.debug(`Removing event listener for ${event}`)
 
       if (this.events[event]) {
@@ -260,7 +261,7 @@ export class SDK {
 
   /**
    * Add a new export data row into the dropdown.
-   * 
+   *
    * @param name The name of the export data row.
    * @param onClick The callback to execute when the export data row is clicked.
    * @returns {void}
@@ -279,7 +280,7 @@ export class SDK {
 
   /**
    * Remove an export data row from the dropdown.
-   * 
+   *
    * @param name The name of the export data row.
    * @returns {void}
    */
@@ -291,14 +292,14 @@ export class SDK {
       return
     }
 
-    this.exportDataRowValues = this.exportDataRowValues.filter(value => value !== name)
+    this.exportDataRowValues = this.exportDataRowValues.filter((value) => value !== name)
     this.swetrixCallbacks?.onRemoveExportDataRow(name)
   }
 
   public addPanelTab(extensionID: string): (panelID: PanelTab, tabContent?: string, onOpen?: () => void) => void {
     /**
      * Add a new panel tab into the dashboard panels.
-     * 
+     *
      * @param extensionID The ID of the extension.
      * @param panelID The ID of the panel.
      * @param onOpen The callback to execute when the panel tab is opened.
@@ -321,7 +322,7 @@ export class SDK {
   public updatePanelTab(extensionID: string): (panelID: PanelTab, tabContent?: string) => void {
     /**
      * Update a panel tab in the dashboard panels.
-     * 
+     *
      * @param extensionID The ID of the extension.
      * @param panelID The ID of the panel.
      * @param tabContent The new content of the panel tab.
@@ -343,7 +344,7 @@ export class SDK {
   public removePanelTab(extensionID: string): (panelID: PanelTab) => void {
     /**
      * Remove a panel tab from the dashboard panels.
-     * 
+     *
      * @param panelID The ID of the panel.
      * @returns {void}
      */
