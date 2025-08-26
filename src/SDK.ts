@@ -88,6 +88,8 @@ type SwetrixCallbacks = {
   onAddPanelTab: (extensionID: string, panelID: string, tabContent?: string, onClick?: () => void) => void
   onUpdatePanelTab: (extensionID: string, panelID: string, tabContent?: string) => void
   onRemovePanelTab: (extensionID: string, panelID: string) => void
+  onCustomizePanelTab: (extensionID: string, panelID: string, tabContent: string) => void
+  onAddNewPanelTab: (extensionID: string, panelID: string, tabContent: string) => void
 }
 
 /**
@@ -358,6 +360,49 @@ export class SDK {
       }
 
       this.swetrixCallbacks?.onRemovePanelTab(extensionID, panelID)
+    }
+  }
+
+  public customizePanelTab(extensionID: string): (panelID: PanelTab, tabContent: string) => void {
+    /**
+     * Customize a panel tab.
+     * 
+     * @param panelID The ID of the panel.
+     * @param tabContent The new content of the tab.
+     * @returns {void}
+     */
+    return (panelID: PanelTab, tabContent: string): void => {
+      this.debug(`Customizing panel tab ${panelID}`)
+      const panelName = getPanelTabName(extensionID, panelID)
+
+      if (!this.panelTabValues.includes(panelName)) {
+        this.debug(`Panel tab ${panelID} (${extensionID}) does not exist`, DebugType.WARN)
+        return
+      }
+
+      this.swetrixCallbacks?.onCustomizePanelTab(extensionID, panelID, tabContent)
+    }
+  }
+
+  public addNewPanelTab(extensionID: string): (panelID: PanelTab, tabContent: string) => void {
+    /**
+     * Add a new panel tab into the dashboard panels.
+     * 
+     * @param extensionID The ID of the extension.
+     * @param panelID The ID of the panel.
+     * @returns {void}
+     */
+    return (panelID: PanelTab, tabContent: string): void => {
+      this.debug(`Adding panel tab ${panelID}`)
+      const panelName = getPanelTabName(extensionID, panelID)
+
+      if (this.panelTabValues.includes(panelName)) {
+        this.debug(`Panel tab ${panelID} (${extensionID}) already exists`, DebugType.WARN)
+        return
+      }
+
+      this.panelTabValues.push(panelName)
+      this.swetrixCallbacks?.onAddNewPanelTab(extensionID, panelID, tabContent)
     }
   }
 }
